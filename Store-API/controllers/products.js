@@ -3,10 +3,7 @@ const Product = require('../models/product')
 
 const getAllProductsStatic = async (req, res) => {
     const search = 'a'
-    const products = await Product.find({
-        // Regex options - 'i' means case insensitive
-        name: {$regex: search, $options: 'i'}
-    })
+    const products = await Product.find({}).sort('-name price')
     res.status(200).json({ products, nbHits: products.length })    
 }
 
