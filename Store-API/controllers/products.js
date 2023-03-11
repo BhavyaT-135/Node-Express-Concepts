@@ -12,7 +12,7 @@ const getAllProductsStatic = async (req, res) => {
 }
 
 const getAllProducts = async (req, res) => {
-    const { featured, company, name, sort, fields } = req.query
+    const { featured, company, name, sort, fields, numericFilters } = req.query
     const queryObject = {}
 
     if (featured) {
@@ -24,6 +24,26 @@ const getAllProducts = async (req, res) => {
     if (name) {
         queryObject.name = {$regex: name, $options: 'i'}
     }
+
+    if (numericFilters) {
+        const operatorMap = {
+            '>': '$gt',
+            '>=': '$gte',
+            '<': '$lt',
+            '<=': '$lte',
+            '=': '$eq'
+        }
+        const regEx = /\b(<|>|<=|>=|=)\b/g
+        let filters = numericFilters.replace(regEx, (match) => `-${operatorMap[match]}-`)
+        const options = ['price', 'rating'];
+        filters = filters.split(',').forEach((item) => {
+            const [field, operator, value] = item.split('-')
+            if (options.includes(field)) {
+                queryObject[field] = {[operator]:Number(value)}
+            }
+        })
+    }
+
     // console.log(queryObject)
     //With sort, we'll have to seperately handle the case where the sort value is not provided in the query
     //because sort is chained to the find property and we would have to display all values if no sort query is available 
