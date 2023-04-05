@@ -1,4 +1,4 @@
-const express = requie('express')
+const express = require('express')
 const router = express.Router()
 
 const { getAllJobs, getJob, createJob, updateJob, deleteJob } = require('../controllers/jobs')
