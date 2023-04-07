@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -18,6 +19,13 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Please provide password'],
     minlength: 6,
   }
+})
+
+// Use the keyword function, instead of an arrow function
+UserSchema.pre('save', async function (next) {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt)
+  next()
 })
 
 module.exports = mongoose.model('User', UserSchema)
